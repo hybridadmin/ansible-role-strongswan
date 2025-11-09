@@ -1,3 +1,5 @@
+---
+role_name_check: 1
 dependency:
   name: galaxy
   options:
@@ -5,21 +7,15 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: ${ROLE_NAME:-testing}-${MOLECULE_DISTRO:-ubuntu}-${MOLECULE_DISTRO_TAG:-jammy}
-    image: "hybridadmin/ansible-${MOLECULE_DISTRO:-ubuntu}:${MOLECULE_DISTRO_TAG:-jammy}"
+  - name: instance
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-rockylinux9}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
-    cgroupns_mode: host
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
     privileged: true
     pre_build_image: true
 provisioner:
   name: ansible
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yml}
-  log: true
-  options:
-    v: true
-verifier:
-  name: ansible
-  enabled: False
