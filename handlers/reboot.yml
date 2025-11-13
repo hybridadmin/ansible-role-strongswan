@@ -3,6 +3,7 @@
   shell: sleep 2 && shutdown -r now
   async: 1
   poll: 0
+  changed_when: false
 #  ignore_errors: true
 
 - name: wait for SSH port down

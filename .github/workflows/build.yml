@@ -1,85 +1,35 @@
-name: CI
+name: run_molecule
 
-"on":
-  pull_request:
-  push:
-    branches:
-      - master
-  schedule:
-    - cron: "0 6 * * 3"
-
-defaults:
-  run:
-    working-directory: "hybridadmin.strongswan"
+on: [push]
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v2
-        with:
-          path: "hybridadmin.strongswan"
+  run_linting:
+    uses: hybridadmin/reuse-workflows/.github/workflows/linting.yml@main
+    secrets: inherit
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.x"
-
-      - name: Install test dependencies.
-        run: pip3 install ansible yamllint ansible-lint
-
-      - name: Lint code.
-        run: |
-          yamllint .
-          ansible-lint .
-
-  molecule:
+  run_test:
     needs:
-      - lint
-    name: Molecule
-    runs-on: ubuntu-20.04
+      - run_linting
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 4
       matrix:
         distro:
-          - image: centos
-            tag: 8
-          - image: centos
-            tag: 7
+          - image: ubuntu
+            tag: noble
+          - image: ubuntu
+            tag: jammy
           - image: ubuntu
             tag: focal
-          - image: ubuntu
-            tag: bionic
           - image: debian
-            tag: 10
+            tag: 13
           - image: debian
-            tag: 9
-    env:
-      ANSIBLE_CALLBACK_WHITELIST: profile_tasks
-      ANSIBLE_STDOUT_CALLBACK: yaml
-      ANSIBLE_VERBOSITY: 1
-      ANSIBLE_LOAD_CALLBACK_PLUGINS: true
-    steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v2
-        with:
-          path: "hybridadmin.strongswan"
+            tag: 12
+    uses: hybridadmin/reuse-workflows/.github/workflows/molecule.yml@main
+    secrets: inherit
+    with:
+      distro_image: '${{ matrix.distro.image }}'
+      distro_tag: '${{ matrix.distro.tag }}'
+      working_directory: 'hybridadmin.strongswan'
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.x"
-
-      - name: Install test dependencies.
-        run: pip3 install ansible molecule-docker yamllint ansible-lint
-
-      - name: Run Molecule tests.
-        run: molecule test
-        env:
-          PY_COLORS: "1"
-          ANSIBLE_FORCE_COLOR: "1"
-          MOLECULE_DISTRO: ${{ matrix.distro.image }}
-          MOLECULE_DISTRO_TAG: ${{ matrix.distro.tag }}
+#

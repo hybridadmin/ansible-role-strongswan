@@ -9,6 +9,7 @@
 
 - name: sysctl reload
   command: sysctl -p "{{ sysctl_conf_file }}"
+  changed_when: false
 
 - name: configure
   command: ./configure {{ strongswan_build_cmd }}
