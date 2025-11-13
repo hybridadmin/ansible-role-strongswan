@@ -1,4 +1,5 @@
 ---
+
 - name: Copy certificate from localhost to client
   copy:
     src: "{{ item.src }}"

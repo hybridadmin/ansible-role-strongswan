@@ -1,4 +1,5 @@
 ---
+
 - block:
     - name: Change to permissive value for SELinux
       selinux:

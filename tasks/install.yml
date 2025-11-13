@@ -1,10 +1,14 @@
 ---
+
 - name: Install required build packages
   action: >
     {{ ansible_pkg_mgr }} name={{ build_package_list }} state=present update_cache=yes
-  #    vars:
-  #      packages: "{{ build_package_list }}"
   when: build_package_list is defined
+
+- name: Build fix - Debian trixie
+  set_fact:
+    strongswan_build_cmd: "{{ strongswan_build_cmd }} --with-systemdsystemunitdir=/usr/lib/systemd/system"
+  when: ansible_distribution == 'Debian' and ansible_distribution_release == 'trixie'
 
 - name: "download archive strongswan-{{ strongswan_version }}.tar.gz"
   unarchive:
@@ -30,7 +34,6 @@
 - name: "create user {{ strongswan_usr }}"
   user:
     name: "{{ strongswan_usr }}"
-    #    home: "{{ strongswan_lib_dir }}"
     comment: "strongSwan IPsec IKEv1/IKEv2 daemon user"
     group: strongswan
     system: yes
