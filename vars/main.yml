@@ -12,7 +12,7 @@ strongswan_conf_file: "/etc/strongswan.d/01-strongswan.conf"
 
 strongswan_swanctl_config_file: "{{ strongswan_swanctl_config_dir }}/swanctl.conf"
 
-pki_cmd: "{% if strongswan_version is version_compare('6.0', '<=') %}ipsec pki{% else %}pki{% endif %}
+pki_cmd: "{% if strongswan_version is version_compare('6.0', '<=') %}ipsec pki{% else %}pki{% endif %}"
 
 _build_package_list:
   default:
