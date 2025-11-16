@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    strongswan_version: 5.9.4
+    strongswan_version: 6.0.3
     _system_packages:
       default:
         - git
@@ -27,4 +27,4 @@
 
     - name: "Include hybridadmin.strongswan role"
       include_role:
-        name: "hybridadmin.strongswan"
+        name: "../../.." #"hybridadmin.strongswan"
