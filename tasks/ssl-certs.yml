@@ -66,7 +66,7 @@
     - name: "Generate CA root key"
       shell: |
         set -o pipefail
-        ipsec pki --gen --type rsa --size 4096 --outform pem > {{ ansible_user_dir }}/pki/private/ca-key.pem
+        {{ pki_cmd }} --gen --type ed25519 --outform pem > {{ ansible_user_dir }}/pki/private/ca-key.pem
       args:
         executable: /bin/bash
         creates: "{{ ansible_user_dir }}/pki/private/ca-key.pem"
@@ -74,7 +74,7 @@
     - name: "Create root certificate authority"
       shell: |
         set -o pipefail
-        ipsec pki --self --ca --lifetime 3650 --in {{ ansible_user_dir }}/pki/private/ca-key.pem --type rsa \
+        {{ pki_cmd }} --self --ca --lifetime 3650 --in {{ ansible_user_dir }}/pki/private/ca-key.pem \
         --dn "CN=VPN root CA" --outform pem > {{ ansible_user_dir }}/pki/cacerts/ca-cert.pem
       args:
         executable: /bin/bash
@@ -83,7 +83,7 @@
     - name: "Create VPN Server private key"
       shell: |
         set -o pipefail
-        ipsec pki --gen --type rsa --size 4096 --outform pem > {{ ansible_user_dir }}/pki/private/server-key.pem
+        {{ pki_cmd }} --gen --type rsa --size 4096 --outform pem > {{ ansible_user_dir }}/pki/private/server-key.pem
       args:
         executable: /bin/bash
         creates: "{{ ansible_user_dir }}/pki/private/server-key.pem"
@@ -91,8 +91,8 @@
     - name: "Sign VPN server certificate"
       shell: |
         set -o pipefail
-        ipsec pki --pub --in {{ ansible_user_dir }}/pki/private/server-key.pem \
-           --type rsa | ipsec pki --issue --lifetime 1825 \
+        {{ pki_cmd }} --pub --in {{ ansible_user_dir }}/pki/private/server-key.pem \
+           --type rsa | {{ pki_cmd }} --issue --lifetime 1825 \
                 --cacert {{ ansible_user_dir }}/pki/cacerts/ca-cert.pem \
                 --cakey {{ ansible_user_dir }}/pki/private/ca-key.pem \
                 --dn "CN={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}" \
